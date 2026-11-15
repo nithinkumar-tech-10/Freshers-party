@@ -682,7 +682,7 @@ export function RegisterForm() {
                             Non-Veg
                           </h4>
                           <p className="text-xs text-[#FFF8E7]/70 mt-1">
-                            Savory chicken biryani and chef-crafted non-veg feast.
+                            Savory chicken and chef-crafted non-veg feast.
                           </p>
                         </div>
                       </button>
