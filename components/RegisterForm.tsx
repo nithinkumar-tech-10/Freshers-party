@@ -134,25 +134,21 @@ export function RegisterForm() {
 
     setIsSubmitting(true);
     setError("");
-    try {
-      const payload: RegistrationData = {
-        name: trimmedName,
-        regNo: formattedRegNo,
-        department: formData.department,
-        year: "1st Year",
-        food: formData.food,
-      };
 
-      const response = await submitRegistration(payload);
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      setRegistrationId(response.id);
-      fireSuccessConfetti();
-    } catch (err) {
-      console.error(err);
-      setIsSubmitting(false);
-      setError("Something went wrong. Please try again.");
-    }
+    const payload: RegistrationData = {
+      name: trimmedName,
+      regNo: formattedRegNo,
+      department: formData.department,
+      year: "1st Year",
+      food: formData.food,
+    };
+
+    await submitRegistration(payload);
+    const passId = `AGM-${Math.floor(100000 + Math.random() * 900000)}`;
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+    setRegistrationId(passId);
+    fireSuccessConfetti();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
