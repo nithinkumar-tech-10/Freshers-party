@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8E7" />
+      <stop offset="40%" stop-color="#F5E19A" />
+      <stop offset="70%" stop-color="#D4AF37" />
+      <stop offset="100%" stop-color="#997819" />
+    </linearGradient>
+    <radialGradient id="navy" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#142852" />
+      <stop offset="100%" stop-color="#060E22" />
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#navy)" />
+  <rect x="3" y="3" width="122" height="122" rx="25" fill="none" stroke="url(#gold)" stroke-width="2.5" opacity="0.8" />
+  <polygon points="64,28 100,42 64,56 28,42" fill="url(#gold)" />
+  <path d="M42,50 v14 c0,8 10,14 22,14 s22,-6 22,-14 v-14" fill="none" stroke="url(#gold)" stroke-width="2.5" />
+  <path d="M96,44 v24" stroke="url(#gold)" stroke-width="2" stroke-linecap="round" />
+  <circle cx="96" cy="70" r="3" fill="url(#gold)" />
+  <text x="64" y="106" font-family="'Cinzel', serif, Georgia" font-size="34" font-weight="bold" fill="url(#gold)" text-anchor="middle" letter-spacing="1">A</text>
+  <polygon points="64,18 66,22 70,22 67,24 68,28 64,25 60,28 61,24 58,22 62,22" fill="#F5E19A" />
+</svg>
+

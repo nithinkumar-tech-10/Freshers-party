@@ -1,0 +1,11 @@
+{
+  "name": "fp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix aagman run dev",
+    "build": "npm --prefix aagman run build",
+    "start": "npm --prefix aagman run start"
+  }
+}
+
