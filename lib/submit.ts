@@ -13,16 +13,38 @@ export interface SubmissionResponse {
 }
 
 /**
- * Simulates registration submission with a 1.5s delay.
- * Ready for Google Sheets / API integration.
+ * Submits registration data to Google Sheets via Google Apps Script Web App.
  */
 export async function submitRegistration(
   data: RegistrationData
 ): Promise<SubmissionResponse> {
-  console.log("Submitting AAGMAN 2K26 Registration:", data);
+  const scriptUrl = process.env.NEXT_PUBLIC_SCRIPT_URL;
 
-  // Simulate network latency (1.5 seconds)
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  if (!scriptUrl) {
+    throw new Error("NEXT_PUBLIC_SCRIPT_URL is not configured.");
+  }
+
+  const payload = {
+    name: data.name,
+    regNo: data.regNo,
+    department: data.department,
+    year: data.year,
+    food: data.food,
+  };
+
+  try {
+    await fetch(scriptUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    console.error("Network error submitting registration:", error);
+    throw error;
+  }
 
   // Backup in localStorage if in client environment
   if (typeof window !== "undefined") {
@@ -31,7 +53,7 @@ export async function submitRegistration(
         localStorage.getItem("aagman_registrations") || "[]"
       );
       existing.push({
-        ...data,
+        ...payload,
         submittedAt: new Date().toISOString(),
       });
       localStorage.setItem("aagman_registrations", JSON.stringify(existing));
@@ -48,4 +70,3 @@ export async function submitRegistration(
     id: generatedId,
   };
 }
-

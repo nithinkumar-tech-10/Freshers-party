@@ -115,17 +115,29 @@ export function RegisterForm() {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+
+    const trimmedName = formData.name.trim();
+    const formattedRegNo = formData.regNo.trim().toUpperCase();
+
     if (!formData.department) {
       setError("Department is required. Please select CSE or CSD.");
       return;
     }
 
+    // Keep state synchronized with trimmed/uppercase values
+    setFormData((prev) => ({
+      ...prev,
+      name: trimmedName,
+      regNo: formattedRegNo,
+    }));
+
     setIsSubmitting(true);
     setError("");
     try {
       const payload: RegistrationData = {
-        name: formData.name.trim(),
-        regNo: formData.regNo.trim().toUpperCase(),
+        name: trimmedName,
+        regNo: formattedRegNo,
         department: formData.department,
         year: "1st Year",
         food: formData.food,
@@ -139,7 +151,7 @@ export function RegisterForm() {
     } catch (err) {
       console.error(err);
       setIsSubmitting(false);
-      setError("Something went wrong while submitting. Please try again.");
+      setError("Something went wrong. Please try again.");
     }
   };
 
@@ -694,7 +706,10 @@ export function RegisterForm() {
                 {currentStep > 1 ? (
                   <MagneticButton
                     onClick={handleBack}
-                    className="px-5 py-3 rounded-full text-xs font-serif uppercase tracking-widest text-[#FFF8E7]/80 hover:text-[#FFF8E7] border border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 transition-colors flex items-center gap-2 cursor-pointer"
+                    disabled={isSubmitting}
+                    className={`px-5 py-3 rounded-full text-xs font-serif uppercase tracking-widest text-[#FFF8E7]/80 hover:text-[#FFF8E7] border border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 transition-colors flex items-center gap-2 cursor-pointer ${
+                      isSubmitting ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+                    }`}
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Back</span>
@@ -705,9 +720,18 @@ export function RegisterForm() {
 
                 <MagneticButton
                   onClick={handleNext}
-                  className="gold-btn px-7 py-3 rounded-full text-xs font-serif uppercase tracking-widest flex items-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+                  disabled={isSubmitting}
+                  className={`gold-btn px-7 py-3 rounded-full text-xs font-serif uppercase tracking-widest flex items-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(212,175,55,0.4)] ${
+                    isSubmitting ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+                  }`}
                 >
-                  <span>{currentStep === TOTAL_STEPS ? "Confirm RSVP" : "Next"}</span>
+                  <span>
+                    {currentStep === TOTAL_STEPS
+                      ? isSubmitting
+                        ? "Submitting..."
+                        : "Confirm RSVP"
+                      : "Next"}
+                  </span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </MagneticButton>
               </div>
