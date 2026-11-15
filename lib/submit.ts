@@ -1,9 +1,9 @@
 export interface RegistrationData {
   name: string;
   regNo: string;
-  department: string;
-  year: string;
-  foodPreference: "Team Veg" | "Team Non-Veg";
+  department: "CSE" | "CSD";
+  year: "1st Year";
+  food: "Veg" | "Non-Veg";
 }
 
 export interface SubmissionResponse {

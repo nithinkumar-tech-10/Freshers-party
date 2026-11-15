@@ -11,6 +11,9 @@ import {
   Sparkles,
   Salad,
   Beef,
+  GraduationCap,
+  Laptop,
+  Palette,
 } from "lucide-react";
 import { submitRegistration, type RegistrationData } from "@/lib/submit";
 import { fireSuccessConfetti } from "./Confetti";
@@ -19,23 +22,13 @@ import { MagneticButton } from "./MagneticButton";
 
 const TOTAL_STEPS = 4;
 
-const DEPARTMENTS = [
-  "Computer Science and Engineering (CSE)",
-  "Computer Science and Design (CSD)",
-  "Information Science and Engineering (ISE)",
-  "Artificial Intelligence & Machine Learning (AIML)",
-  "Electronics and Communication Engineering (ECE)",
-  "Mechanical Engineering (ME)",
-  "Civil Engineering (CV)",
-  "Other Department",
-];
-
-const YEARS = [
-  "1st Year (Freshers - Guest of Honor)",
-  "2nd Year (Sophomore)",
-  "3rd Year (Junior)",
-  "4th Year (Senior)",
-];
+interface FormState {
+  name: string;
+  regNo: string;
+  department: "CSE" | "CSD" | "";
+  year: "1st Year";
+  food: "Veg" | "Non-Veg";
+}
 
 const stepVariants = {
   enter: (direction: number) => ({
@@ -55,12 +48,12 @@ const stepVariants = {
 export function RegisterForm() {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [direction, setDirection] = useState<number>(1);
-  const [formData, setFormData] = useState<RegistrationData>({
+  const [formData, setFormData] = useState<FormState>({
     name: "",
     regNo: "",
-    department: "Computer Science and Engineering (CSE)",
-    year: "1st Year (Freshers - Guest of Honor)",
-    foodPreference: "Team Veg",
+    department: "",
+    year: "1st Year",
+    food: "Veg",
   });
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -78,9 +71,9 @@ export function RegisterForm() {
     return () => window.removeEventListener("pulse-register-form", handlePulse);
   }, []);
 
-  const updateField = <K extends keyof RegistrationData>(
+  const updateField = <K extends keyof FormState>(
     field: K,
-    value: RegistrationData[K]
+    value: FormState[K]
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError("");
@@ -97,7 +90,13 @@ export function RegisterForm() {
         setError("Please enter your valid College/University Registration No. (USN).");
         return;
       }
+    } else if (currentStep === 3) {
+      if (!formData.department) {
+        setError("Department is required. Please select CSE or CSD to continue.");
+        return;
+      }
     }
+
     setError("");
     if (currentStep < TOTAL_STEPS) {
       setDirection(1);
@@ -116,10 +115,23 @@ export function RegisterForm() {
   };
 
   const handleSubmit = async () => {
+    if (!formData.department) {
+      setError("Department is required. Please select CSE or CSD.");
+      return;
+    }
+
     setIsSubmitting(true);
     setError("");
     try {
-      const response = await submitRegistration(formData);
+      const payload: RegistrationData = {
+        name: formData.name.trim(),
+        regNo: formData.regNo.trim().toUpperCase(),
+        department: formData.department,
+        year: "1st Year",
+        food: formData.food,
+      };
+
+      const response = await submitRegistration(payload);
       setIsSubmitting(false);
       setIsSubmitted(true);
       setRegistrationId(response.id);
@@ -142,9 +154,9 @@ export function RegisterForm() {
     setFormData({
       name: "",
       regNo: "",
-      department: "Computer Science and Engineering (CSE)",
-      year: "1st Year (Freshers - Guest of Honor)",
-      foodPreference: "Team Veg",
+      department: "",
+      year: "1st Year",
+      food: "Veg",
     });
     setDirection(1);
     setCurrentStep(1);
@@ -231,7 +243,7 @@ export function RegisterForm() {
                   Securing your spot...
                 </h3>
                 <p className="text-xs sm:text-sm text-[#FFF8E7]/70 font-sans max-w-xs">
-                  Reserving your VIP seat and food badge for AAGMAN 2K26.
+                  Reserving your VIP seat and meal pass for AAGMAN 2K26.
                 </p>
               </motion.div>
             )}
@@ -266,9 +278,14 @@ export function RegisterForm() {
               {/* VIP Royal Pass */}
               <div className="max-w-md mx-auto p-5 rounded-2xl bg-gradient-to-b from-[#142852]/80 to-[#071228]/90 border border-[#D4AF37]/50 shadow-inner text-left space-y-3">
                 <div className="flex justify-between items-center border-b border-[#D4AF37]/20 pb-2.5">
-                  <span className="text-[10px] uppercase font-serif tracking-widest text-[#D4AF37]">
-                    Pass ID
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-serif tracking-widest text-[#D4AF37]">
+                      Pass ID
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-serif uppercase tracking-widest bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#F5E19A]">
+                      1st Year Freshers
+                    </span>
+                  </div>
                   <span className="font-mono text-sm font-bold text-[#F5E19A]">
                     {registrationId}
                   </span>
@@ -286,12 +303,29 @@ export function RegisterForm() {
                     </p>
                   </div>
                   <div>
-                    <span className="text-[10px] text-[#FFF8E7]/50 uppercase">Meal Pass</span>
-                    <p className="font-medium text-[#F5E19A]">{formData.foodPreference}</p>
+                    <span className="text-[10px] text-[#FFF8E7]/50 uppercase">Department</span>
+                    <p className="font-medium text-[#F5E19A] font-serif">
+                      {formData.department} (
+                      {formData.department === "CSE"
+                        ? "Computer Science & Engg."
+                        : "Computer Science & Design"}
+                      )
+                    </p>
                   </div>
                   <div>
-                    <span className="text-[10px] text-[#FFF8E7]/50 uppercase">Date & Venue</span>
-                    <p className="font-medium text-[#FFF8E7] truncate">17 Nov 2026, Kuvempu</p>
+                    <span className="text-[10px] text-[#FFF8E7]/50 uppercase">Meal Pass</span>
+                    <p className="font-medium text-[#F5E19A] flex items-center gap-1.5">
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          formData.food === "Veg" ? "bg-[#4ADE80]" : "bg-[#FB7185]"
+                        }`}
+                      />
+                      {formData.food}
+                    </p>
+                  </div>
+                  <div className="col-span-2 border-t border-[#D4AF37]/20 pt-2 flex items-center justify-between text-[11px]">
+                    <span className="text-[#FFF8E7]/50">Date & Venue</span>
+                    <span className="text-[#FFF8E7] font-medium">17 Nov 2026, 11:00 AM • Kuvempu Sabhangana</span>
                   </div>
                 </div>
               </div>
@@ -315,12 +349,19 @@ export function RegisterForm() {
             </motion.div>
           ) : (
             <div className="relative z-20" onKeyDown={handleKeyDown}>
-              {/* Step Counter & Smooth Animated Progress Bar */}
+              {/* Header Badge & Step Counter & Smooth Animated Progress Bar */}
               <div className="mb-8">
-                <div className="flex items-center justify-between text-xs font-serif uppercase tracking-widest text-[#D4AF37] mb-2 font-medium">
-                  <span>
-                    Step {currentStep} of {TOTAL_STEPS}
-                  </span>
+                <div className="flex items-center justify-between gap-2 text-xs font-serif uppercase tracking-widest text-[#D4AF37] mb-2 font-medium">
+                  <div className="flex items-center gap-2">
+                    <span>
+                      Step {currentStep} of {TOTAL_STEPS}
+                    </span>
+                    {/* Fixed 1st Year Freshers gold badge */}
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-serif uppercase tracking-wider bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#F5E19A] shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+                      <GraduationCap className="w-3 h-3 text-[#D4AF37]" />
+                      1st Year Freshers
+                    </span>
+                  </div>
                   <span>{Math.round(progressPercentage)}% Completed</span>
                 </div>
 
@@ -418,7 +459,7 @@ export function RegisterForm() {
                   </motion.div>
                 )}
 
-                {/* STEP 3: Department and Year */}
+                {/* STEP 3: Department (CSE / CSD Cards) */}
                 {currentStep === 3 && (
                   <motion.div
                     key="step3"
@@ -433,54 +474,118 @@ export function RegisterForm() {
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="font-serif text-xs uppercase tracking-widest text-[#D4AF37] font-semibold">
-                          Branch & Batch
+                          Department Selection
                         </span>
-                        <span className="text-[10px] font-sans text-[#F5E19A]/80 uppercase tracking-widest border border-[#D4AF37]/30 px-2 py-0.5 rounded-full">
-                          Select Info
+                        <span className="inline-flex items-center gap-1 text-[10px] font-serif text-[#F5E19A] uppercase tracking-wider bg-[#D4AF37]/15 border border-[#D4AF37]/40 px-2.5 py-0.5 rounded-full">
+                          1st Year Freshers
                         </span>
                       </div>
                       <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#FFF8E7] mt-1">
-                        Department and Year
+                        Select Your Department
                       </h3>
                       <p className="text-xs sm:text-sm text-[#FFF8E7]/70 font-sans mt-1">
-                        Help us coordinate seating and department honors.
+                        Choose your branch. Exclusive to 1st year CSE and CSD students.
                       </p>
                     </div>
 
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs uppercase tracking-widest text-[#F5E19A] mb-1.5 font-serif">
-                          Department
-                        </label>
-                        <select
-                          value={formData.department}
-                          onChange={(e) => updateField("department", e.target.value)}
-                          className="w-full px-4 py-3.5 rounded-xl bg-[#060E22]/90 border border-[#D4AF37]/40 text-[#FFF8E7] text-sm focus:outline-none focus:border-[#F5E19A] focus:ring-2 focus:ring-[#D4AF37]/30 transition-all font-sans cursor-pointer"
-                        >
-                          {DEPARTMENTS.map((dept) => (
-                            <option key={dept} value={dept} className="bg-[#060E22] text-[#FFF8E7]">
-                              {dept}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                      {/* CSE Card */}
+                      <button
+                        type="button"
+                        onClick={() => updateField("department", "CSE")}
+                        className={`p-6 rounded-2xl border text-left transition-all duration-300 relative flex flex-col justify-between cursor-pointer group ${
+                          formData.department === "CSE"
+                            ? "bg-[#142852]/80 border-[#F5E19A] shadow-[0_0_30px_rgba(212,175,55,0.45)] scale-[1.03]"
+                            : "bg-[#060E22]/70 border-[#D4AF37]/30 hover:border-[#F5E19A]/60 opacity-85 hover:opacity-100 hover:scale-[1.01]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <div
+                            className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
+                              formData.department === "CSE"
+                                ? "bg-[#D4AF37]/25 border border-[#F5E19A] text-[#F5E19A]"
+                                : "bg-[#0B1B3F] border border-[#D4AF37]/30 text-[#D4AF37]"
+                            }`}
+                          >
+                            <Laptop className="w-6 h-6" />
+                          </div>
 
-                      <div>
-                        <label className="block text-xs uppercase tracking-widest text-[#F5E19A] mb-1.5 font-serif">
-                          Academic Year
-                        </label>
-                        <select
-                          value={formData.year}
-                          onChange={(e) => updateField("year", e.target.value)}
-                          className="w-full px-4 py-3.5 rounded-xl bg-[#060E22]/90 border border-[#D4AF37]/40 text-[#FFF8E7] text-sm focus:outline-none focus:border-[#F5E19A] focus:ring-2 focus:ring-[#D4AF37]/30 transition-all font-sans cursor-pointer"
-                        >
-                          {YEARS.map((yr) => (
-                            <option key={yr} value={yr} className="bg-[#060E22] text-[#FFF8E7]">
-                              {yr}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                          {formData.department === "CSE" ? (
+                            <motion.span
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#D4AF37] to-[#F5E19A] text-[#060E22] flex items-center justify-center text-xs font-bold shadow-[0_0_12px_rgba(212,175,55,0.7)]"
+                            >
+                              ✓
+                            </motion.span>
+                          ) : (
+                            <span className="w-6 h-6 rounded-full border border-[#D4AF37]/30 group-hover:border-[#F5E19A]/60 transition-colors" />
+                          )}
+                        </div>
+
+                        <div>
+                          <div className="flex items-baseline gap-2">
+                            <h4 className="font-serif text-2xl font-bold text-[#FFF8E7]">
+                              CSE
+                            </h4>
+                            <span className="text-[11px] font-serif uppercase tracking-wider text-[#D4AF37]">
+                              Engineering
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#FFF8E7]/70 mt-1 font-sans leading-relaxed">
+                            Computer Science and Engineering
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* CSD Card */}
+                      <button
+                        type="button"
+                        onClick={() => updateField("department", "CSD")}
+                        className={`p-6 rounded-2xl border text-left transition-all duration-300 relative flex flex-col justify-between cursor-pointer group ${
+                          formData.department === "CSD"
+                            ? "bg-[#142852]/80 border-[#F5E19A] shadow-[0_0_30px_rgba(212,175,55,0.45)] scale-[1.03]"
+                            : "bg-[#060E22]/70 border-[#D4AF37]/30 hover:border-[#F5E19A]/60 opacity-85 hover:opacity-100 hover:scale-[1.01]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <div
+                            className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
+                              formData.department === "CSD"
+                                ? "bg-[#D4AF37]/25 border border-[#F5E19A] text-[#F5E19A]"
+                                : "bg-[#0B1B3F] border border-[#D4AF37]/30 text-[#D4AF37]"
+                            }`}
+                          >
+                            <Palette className="w-6 h-6" />
+                          </div>
+
+                          {formData.department === "CSD" ? (
+                            <motion.span
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#D4AF37] to-[#F5E19A] text-[#060E22] flex items-center justify-center text-xs font-bold shadow-[0_0_12px_rgba(212,175,55,0.7)]"
+                            >
+                              ✓
+                            </motion.span>
+                          ) : (
+                            <span className="w-6 h-6 rounded-full border border-[#D4AF37]/30 group-hover:border-[#F5E19A]/60 transition-colors" />
+                          )}
+                        </div>
+
+                        <div>
+                          <div className="flex items-baseline gap-2">
+                            <h4 className="font-serif text-2xl font-bold text-[#FFF8E7]">
+                              CSD
+                            </h4>
+                            <span className="text-[11px] font-serif uppercase tracking-wider text-[#D4AF37]">
+                              Design
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#FFF8E7]/70 mt-1 font-sans leading-relaxed">
+                            Computer Science and Design
+                          </p>
+                        </div>
+                      </button>
                     </div>
                   </motion.div>
                 )}
@@ -502,20 +607,20 @@ export function RegisterForm() {
                         Banquet Preference
                       </span>
                       <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#FFF8E7] mt-1">
-                        Which side are you on?
+                        Select Your Meal
                       </h3>
                       <p className="text-xs sm:text-sm text-[#FFF8E7]/70 font-sans mt-1">
-                        Select your feast choice for the lunch buffet.
+                        Complimentary grand banquet arranged for all freshers.
                       </p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                      {/* Team Veg */}
+                      {/* Veg */}
                       <button
                         type="button"
-                        onClick={() => updateField("foodPreference", "Team Veg")}
+                        onClick={() => updateField("food", "Veg")}
                         className={`p-5 rounded-2xl border text-left transition-all relative flex flex-col justify-between cursor-pointer ${
-                          formData.foodPreference === "Team Veg"
+                          formData.food === "Veg"
                             ? "bg-[#102B19]/70 border-[#4ADE80] shadow-[0_0_25px_rgba(74,222,128,0.3)] scale-[1.02]"
                             : "bg-[#060E22]/70 border-[#D4AF37]/30 hover:border-[#F5E19A]/60 opacity-80 hover:opacity-100"
                         }`}
@@ -524,7 +629,7 @@ export function RegisterForm() {
                           <div className="w-12 h-12 rounded-xl bg-[#166534]/50 border border-[#4ADE80]/50 flex items-center justify-center">
                             <Salad className="w-6 h-6 text-[#4ADE80]" />
                           </div>
-                          {formData.foodPreference === "Team Veg" && (
+                          {formData.food === "Veg" && (
                             <span className="w-6 h-6 rounded-full bg-[#4ADE80] text-[#060E22] flex items-center justify-center text-xs font-bold">
                               ✓
                             </span>
@@ -532,7 +637,7 @@ export function RegisterForm() {
                         </div>
                         <div>
                           <h4 className="font-serif text-lg font-bold text-[#FFF8E7]">
-                            Team Veg
+                            Veg
                           </h4>
                           <p className="text-xs text-[#FFF8E7]/70 mt-1">
                             Delicious royal vegetarian cuisine & traditional delicacies.
@@ -540,12 +645,12 @@ export function RegisterForm() {
                         </div>
                       </button>
 
-                      {/* Team Non-Veg */}
+                      {/* Non-Veg */}
                       <button
                         type="button"
-                        onClick={() => updateField("foodPreference", "Team Non-Veg")}
+                        onClick={() => updateField("food", "Non-Veg")}
                         className={`p-5 rounded-2xl border text-left transition-all relative flex flex-col justify-between cursor-pointer ${
-                          formData.foodPreference === "Team Non-Veg"
+                          formData.food === "Non-Veg"
                             ? "bg-[#331114]/70 border-[#FB7185] shadow-[0_0_25px_rgba(251,113,133,0.3)] scale-[1.02]"
                             : "bg-[#060E22]/70 border-[#D4AF37]/30 hover:border-[#F5E19A]/60 opacity-80 hover:opacity-100"
                         }`}
@@ -554,7 +659,7 @@ export function RegisterForm() {
                           <div className="w-12 h-12 rounded-xl bg-[#881337]/50 border border-[#FB7185]/50 flex items-center justify-center">
                             <Beef className="w-6 h-6 text-[#FB7185]" />
                           </div>
-                          {formData.foodPreference === "Team Non-Veg" && (
+                          {formData.food === "Non-Veg" && (
                             <span className="w-6 h-6 rounded-full bg-[#FB7185] text-[#060E22] flex items-center justify-center text-xs font-bold">
                               ✓
                             </span>
@@ -562,7 +667,7 @@ export function RegisterForm() {
                         </div>
                         <div>
                           <h4 className="font-serif text-lg font-bold text-[#FFF8E7]">
-                            Team Non-Veg
+                            Non-Veg
                           </h4>
                           <p className="text-xs text-[#FFF8E7]/70 mt-1">
                             Savory chicken biryani and chef-crafted non-veg feast.
