@@ -1,6 +1,5 @@
 export interface RegistrationData {
   name: string;
-  regNo: string;
   department: "CSE" | "CSD";
   year: "1st Year";
   food: "Veg" | "Non-Veg";

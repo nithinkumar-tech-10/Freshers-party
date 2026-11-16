@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   User,
-  Hash,
   ArrowRight,
   ArrowLeft,
   Sparkles,
@@ -15,16 +14,14 @@ import {
   Palette,
 } from "lucide-react";
 import { submitRegistration, type RegistrationData } from "@/lib/submit";
-import { fireSuccessConfetti } from "./Confetti";
 import { FloralCorner, GoldDivider, RoyalCrownIcon } from "./DecorativeDividers";
 import { MagneticButton } from "./MagneticButton";
 import { PosterRevealSuccess } from "./PosterRevealSuccess";
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 3;
 
 interface FormState {
   name: string;
-  regNo: string;
   department: "CSE" | "CSD" | "";
   year: "1st Year";
   food: "Veg" | "Non-Veg";
@@ -50,7 +47,6 @@ export function RegisterForm() {
   const [direction, setDirection] = useState<number>(1);
   const [formData, setFormData] = useState<FormState>({
     name: "",
-    regNo: "",
     department: "",
     year: "1st Year",
     food: "Veg",
@@ -85,11 +81,6 @@ export function RegisterForm() {
         return;
       }
     } else if (currentStep === 2) {
-      if (!formData.regNo.trim() || formData.regNo.trim().length < 3) {
-        setError("Please enter your valid College/University Registration No. (USN).");
-        return;
-      }
-    } else if (currentStep === 3) {
       if (!formData.department) {
         setError("Department is required. Please select CSE or CSD to continue.");
         return;
@@ -117,18 +108,16 @@ export function RegisterForm() {
     if (isSubmitting) return;
 
     const trimmedName = formData.name.trim();
-    const formattedRegNo = formData.regNo.trim().toUpperCase();
 
     if (!formData.department) {
       setError("Department is required. Please select CSE or CSD.");
       return;
     }
 
-    // Keep state synchronized with trimmed/uppercase values
+    // Keep state synchronized with trimmed value
     setFormData((prev) => ({
       ...prev,
       name: trimmedName,
-      regNo: formattedRegNo,
     }));
 
     setIsSubmitting(true);
@@ -136,7 +125,6 @@ export function RegisterForm() {
 
     const payload: RegistrationData = {
       name: trimmedName,
-      regNo: formattedRegNo,
       department: formData.department,
       year: "1st Year",
       food: formData.food,
@@ -157,7 +145,6 @@ export function RegisterForm() {
   const resetForm = () => {
     setFormData({
       name: "",
-      regNo: "",
       department: "",
       year: "1st Year",
       food: "Veg",
@@ -219,7 +206,7 @@ export function RegisterForm() {
               : {}
           }
           transition={{ duration: 1.2, ease: "easeInOut" }}
-          className={`relative rounded-3xl p-6 sm:p-10 royal-glass shadow-[0_20px_50px_rgba(0,0,0,0.7)] backdrop-blur-2xl border transition-colors duration-500 overflow-hidden ${
+          className={`relative rounded-3xl p-4 sm:p-10 royal-glass shadow-[0_20px_50px_rgba(0,0,0,0.7)] backdrop-blur-2xl border transition-colors duration-500 overflow-hidden ${
             isPulsing ? "border-[#F5E19A]" : "border-[#D4AF37]/35"
           }`}
         >
@@ -330,51 +317,10 @@ export function RegisterForm() {
                   </motion.div>
                 )}
 
-                {/* STEP 2: Registration Number */}
+                {/* STEP 2: Department (CSE / CSD Cards) */}
                 {currentStep === 2 && (
                   <motion.div
                     key="step2"
-                    custom={direction}
-                    variants={stepVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{ duration: 0.32, ease: "easeInOut" }}
-                    className="space-y-5"
-                  >
-                    <div>
-                      <span className="font-serif text-xs uppercase tracking-widest text-[#D4AF37] font-semibold">
-                        Academic Credentials
-                      </span>
-                      <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#FFF8E7] mt-1">
-                        Your Regd No.?
-                      </h3>
-                      <p className="text-xs sm:text-sm text-[#FFF8E7]/70 font-sans mt-1">
-                        Enter your GMIT University Seat Number (USN) or College Roll No.
-                      </p>
-                    </div>
-
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#D4AF37]">
-                        <Hash className="w-5 h-5" />
-                      </div>
-                      <input
-                        type="text"
-                        autoFocus
-                        value={formData.regNo}
-                        onChange={(e) => updateField("regNo", e.target.value)}
-                        placeholder="e.g. 4GM26CS001"
-                        className="w-full pl-12 pr-4 py-4 rounded-xl bg-[#060E22]/80 border border-[#D4AF37]/40 text-[#FFF8E7] placeholder-[#FFF8E7]/30 text-base sm:text-lg focus:outline-none focus:border-[#F5E19A] focus:ring-2 focus:ring-[#D4AF37]/30 transition-all font-mono uppercase"
-                        aria-label="Your registration number or USN"
-                      />
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* STEP 3: Department (CSE / CSD Cards) */}
-                {currentStep === 3 && (
-                  <motion.div
-                    key="step3"
                     custom={direction}
                     variants={stepVariants}
                     initial="enter"
@@ -502,10 +448,10 @@ export function RegisterForm() {
                   </motion.div>
                 )}
 
-                {/* STEP 4: Food Preference Cards */}
-                {currentStep === 4 && (
+                {/* STEP 3: Food Preference Cards */}
+                {currentStep === 3 && (
                   <motion.div
-                    key="step4"
+                    key="step3"
                     custom={direction}
                     variants={stepVariants}
                     initial="enter"
