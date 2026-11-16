@@ -7,7 +7,6 @@ import {
   Hash,
   ArrowRight,
   ArrowLeft,
-  CheckCircle2,
   Sparkles,
   Salad,
   Beef,
@@ -19,6 +18,7 @@ import { submitRegistration, type RegistrationData } from "@/lib/submit";
 import { fireSuccessConfetti } from "./Confetti";
 import { FloralCorner, GoldDivider, RoyalCrownIcon } from "./DecorativeDividers";
 import { MagneticButton } from "./MagneticButton";
+import { PosterRevealSuccess } from "./PosterRevealSuccess";
 
 const TOTAL_STEPS = 4;
 
@@ -58,7 +58,6 @@ export function RegisterForm() {
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
-  const [registrationId, setRegistrationId] = useState<string>("");
   const [isPulsing, setIsPulsing] = useState<boolean>(false);
 
   useEffect(() => {
@@ -144,11 +143,8 @@ export function RegisterForm() {
     };
 
     await submitRegistration(payload);
-    const passId = `AGM-${Math.floor(100000 + Math.random() * 900000)}`;
     setIsSubmitting(false);
     setIsSubmitted(true);
-    setRegistrationId(passId);
-    fireSuccessConfetti();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -257,104 +253,12 @@ export function RegisterForm() {
             )}
           </AnimatePresence>
 
-          {/* Success Screen */}
+          {/* Success Screen: Animated Envelope & Invitation Poster Reveal */}
           {isSubmitted ? (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="relative z-20 text-center py-6 sm:py-8 space-y-6"
-            >
-              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-[#D4AF37] to-[#F5E19A] p-0.5 flex items-center justify-center shadow-[0_0_35px_rgba(212,175,55,0.6)]">
-                <div className="w-full h-full bg-[#060E22] rounded-full flex items-center justify-center">
-                  <CheckCircle2 className="w-10 h-10 text-[#F5E19A]" />
-                </div>
-              </div>
-
-              <div>
-                <span className="font-serif text-xs uppercase tracking-[0.25em] text-[#D4AF37] font-semibold">
-                  Invitation Confirmed
-                </span>
-                <h3 className="font-serif text-3xl sm:text-4xl font-extrabold shimmer-text mt-1">
-                  You&apos;re on the list!
-                </h3>
-                <p className="font-script text-2xl text-[#F5E19A] mt-2">
-                  Welcome to the college family, {formData.name}!
-                </p>
-              </div>
-
-              {/* VIP Royal Pass */}
-              <div className="max-w-md mx-auto p-5 rounded-2xl bg-gradient-to-b from-[#142852]/80 to-[#071228]/90 border border-[#D4AF37]/50 shadow-inner text-left space-y-3">
-                <div className="flex justify-between items-center border-b border-[#D4AF37]/20 pb-2.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase font-serif tracking-widest text-[#D4AF37]">
-                      Pass ID
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-serif uppercase tracking-widest bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#F5E19A]">
-                      1st Year Freshers
-                    </span>
-                  </div>
-                  <span className="font-mono text-sm font-bold text-[#F5E19A]">
-                    {registrationId}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <span className="text-[10px] text-[#FFF8E7]/50 uppercase">Name</span>
-                    <p className="font-medium text-[#FFF8E7] truncate">{formData.name}</p>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-[#FFF8E7]/50 uppercase">Regd No.</span>
-                    <p className="font-medium text-[#FFF8E7] uppercase truncate">
-                      {formData.regNo}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-[#FFF8E7]/50 uppercase">Department</span>
-                    <p className="font-medium text-[#F5E19A] font-serif">
-                      {formData.department} (
-                      {formData.department === "CSE"
-                        ? "Computer Science & Engg."
-                        : "Computer Science & Design"}
-                      )
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-[#FFF8E7]/50 uppercase">Meal Pass</span>
-                    <p className="font-medium text-[#F5E19A] flex items-center gap-1.5">
-                      <span
-                        className={`w-2 h-2 rounded-full ${
-                          formData.food === "Veg" ? "bg-[#4ADE80]" : "bg-[#FB7185]"
-                        }`}
-                      />
-                      {formData.food}
-                    </p>
-                  </div>
-                  <div className="col-span-2 border-t border-[#D4AF37]/20 pt-2 flex items-center justify-between text-[11px]">
-                    <span className="text-[#FFF8E7]/50">Date & Venue</span>
-                    <span className="text-[#FFF8E7] font-medium">17 Nov 2026, 11:00 AM • Kuvempu Sabhangana</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <MagneticButton
-                  onClick={() => fireSuccessConfetti()}
-                  className="gold-btn w-full sm:w-auto px-6 py-3 rounded-full text-xs font-serif uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Sparkles className="w-4 h-4 text-[#060E22]" />
-                  <span>Celebrate Again</span>
-                </MagneticButton>
-
-                <MagneticButton
-                  onClick={resetForm}
-                  className="w-full sm:w-auto px-6 py-3 rounded-full text-xs font-serif uppercase tracking-widest text-[#FFF8E7] border border-[#D4AF37]/40 hover:bg-[#D4AF37]/15 transition-all cursor-pointer"
-                >
-                  Register Another Guest
-                </MagneticButton>
-              </div>
-            </motion.div>
+            <PosterRevealSuccess
+              userName={formData.name}
+              onReset={resetForm}
+            />
           ) : (
             <div className="relative z-20" onKeyDown={handleKeyDown}>
               {/* Header Badge & Step Counter & Smooth Animated Progress Bar */}
